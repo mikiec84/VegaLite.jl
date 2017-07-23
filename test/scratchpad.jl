@@ -48,20 +48,6 @@ data(url=durl) |>
              yquantitative(vlbin(maxbins=10), field=:Rotten_Tomatoes_Rating),
              sizequantitative(aggregate=:count))
 
-p.params
-
-p
-fieldnames(p)
-
-using JSON
-
-function tst(p)
-  pd = JSON.parse(p.json)
-  VegaLite.conforms(pd, "plot(..", VegaLite.defs["plot"])
-end
-
-
-tst(p)
 
 data(url=durl) |>
   transform(vlfilter(field=:IMDB_Rating, oneOf= [1,2])) |>
@@ -73,9 +59,6 @@ data(url=durl) |>
            sizequantitative(aggregate="count")) |>
   plot(width=300, height=300)
 
-vlfilter
-
-showall(keys(VegaLite.defs))
 ##################################################################
 
 using Distributions

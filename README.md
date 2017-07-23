@@ -7,7 +7,12 @@ _Julia bindings to Vega-Lite_
 |[![VegaLite](http://pkg.julialang.org/badges/VegaLite_0.5.svg)](http://pkg.julialang.org/?pkg=VegaLite&ver=0.5) [![VegaLite](http://pkg.julialang.org/badges/VegaLite_0.6.svg)](http://pkg.julialang.org/?pkg=VegaLite&ver=0.6) | [![Build Status](https://travis-ci.org/fredo-dedup/VegaLite.jl.svg?branch=master)](https://travis-ci.org/fredo-dedup/VegaLite.jl) [![Build status](https://ci.appveyor.com/api/projects/status/b9cmmaquuc08n6uc/branch/master?svg=true)](https://ci.appveyor.com/project/fredo-dedup/vegalite-jl/branch/master) | [![Coverage Status](https://coveralls.io/repos/github/fredo-dedup/VegaLite.jl/badge.svg?branch=master)](https://coveralls.io/github/fredo-dedup/VegaLite.jl?branch=master) | [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://fredo-dedup.github.io/VegaLite.jl/stable) [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://fredo-dedup.github.io/VegaLite.jl/latest) |
 
 
-This package provides access to the VegaLite v2 high-level visualization grammar from Julia.
+This package provides access to the VegaLite high-level visualization grammar from Julia.
+
+**New (July 2017)**
+  - upgraded to Vega-Lite v2 (beta), bringing plot concatenation, layers, etc.
+  - new Julia syntax with the pipe operator `|>` to enable an incremental build up of the plot.
+  - the full Vega-Lite specifications are now accessible, not just a subset
 
 `Vega-Lite` (http://vega.github.io/vega-lite/) is a simpler version of the Vega grammar (see https://vega.github.io/vega/ and its associated Julia API https://github.com/johnmyleswhite/Vega.jl) allowing smaller and more expressive chart specifications. Parts of the VegaLite package (rendering functions, IJulia integration) are based on Vega.jl (thanks !).
 
