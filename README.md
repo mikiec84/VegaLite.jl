@@ -69,7 +69,7 @@ The documentation provides a more detailed walk through of the Julia syntax.
 
 When in the REPL or in the Juno IDE, the evaluation of VegaLite statements triggers the opening of a browser window showing the plot. In IJulia the plot is shown in the result block below.
 
-It is possible to render plots to a file (supported formats are svg, png and pdf) by calling :
+It is possible to render plots to a file (contribution by D.Anthoff). Supported formats are svg, png and pdf) :
 - `savefig(filename, plot)` with the file format guesssed form the file extension of `filename`
 - or `svg(filename, plot)`, `pdf(filename, plot)` or `png(filename, plot)`
 
