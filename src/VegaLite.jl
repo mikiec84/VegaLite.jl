@@ -86,20 +86,23 @@ include("show.jl")
 
 ########################  conditional definitions  #######################
 
+nonulldict(row) = map(t -> (t[1], isa(t[2], Nullable) ? get(t[2], "null") : t[2]), row)
+
 ### Integration with DataFrames
 @require DataFrames begin
   function vldata(d::DataFrames.DataFrame)
-    recs = [ Dict(r) for r in DataFrames.eachrow(d) ]
+    recs = [ Dict(nonulldict(r)) for r in DataFrames.eachrow(d) ]
     VegaLite.VLSpec{:data}(Dict("values" => recs))
   end
 
   |>(a::DataFrames.DataFrame, b::VLSpec) = vldata(a) |> b
 end
 
+
 ### Integration with DataTables
 @require DataTables begin
   function vldata(d::DataTables.DataTable)
-    recs = [ Dict(r) for r in DataTables.eachrow(d) ]
+    recs = [ Dict(nonulldict(r)) for r in DataTables.eachrow(d) ]
     VegaLite.VLSpec{:data}(Dict("values" => recs))
   end
 

@@ -14,6 +14,5 @@ r2 = markrect() |>
                colorquantitative(aggregate=:count)) ;
 
 mpg |>
-  vconcat(r1) |>
-  vconcat(r2) |>
-  config(vlcell(width=400))
+  vconcat(r1, width=400) |>
+  vconcat(r2, width=400)
