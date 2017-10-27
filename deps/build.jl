@@ -21,10 +21,3 @@ run(@build_steps begin
   FileDownloader(uvegalite, joinpath(destdir, basename(uvegalite)))
   FileDownloader(uembed,    joinpath(destdir, basename(uembed)))
 end)
-
-# install NodeJS modules
-
-using NodeJS
-using Compat
-
-run(Cmd(`$(npm_cmd()) install`, dir=@__DIR__))

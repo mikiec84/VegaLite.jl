@@ -2,8 +2,9 @@ VERSION >= v"0.4" && __precompile__()
 
 module VegaLite
 
-using JSON, Compat, Requires, NodeJS, Cairo, Rsvg
-# using PhantomJS
+using JSON, Compat, Requires
+using HeadlessChromium
+using FileIO
 
 # import Base: show
 import Base: display, REPL.REPLDisplay

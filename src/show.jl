@@ -1,69 +1,86 @@
-function convert_to_svg(v::VLSpec{:plot})
-    data = JSON.json(v.params)
-    script_path = joinpath(@__DIR__, "compilesvg.js")
-    p_out, p_in, p = readandwrite(`$(nodejs_cmd()) $script_path`)
-    write(p_in, data)
-    flush(p_in)
-    close(p_in)
-    res = readstring(p_out)
-    close(p_out)
-    return res
+
+function withTarget(action::Function, htmlpath::String)
+    tg = Target("file://$htmlpath")
+    action(tg)
+    close(tg)
+end
+
+function getPlotNodeId(tg::Target)
+    send(tg, "Page.enable")
+    send(tg, "DOM.enable")
+
+    # search with xpath '.marks'
+    send(tg2, "DOM.getDocument")
+
+    resp = send(tg, "DOM.performSearch", query=".marks", includeUserAgentShadowDOM=false)
+    resp["result"]["resultCount"] == 0 && error("plot not found")
+    resp["result"]["resultCount"] > 1 && error("plot not located")
+    sid = resp["result"]["searchId"]
+
+    resp = send(tg, "DOM.getSearchResults", searchId=sid, fromIndex=0, toIndex=1)
+    length(resp["result"]["nodeIds"]) != 1 && error("inconsistent number of plot node Ids")
+    pid = resp["result"]["nodeIds"][1]
+    (pid == 0) && error("node not found")
+
+    pid
+end
+
+function getBoxModel(nodeId::Int64)
+    resp = send(tg, "DOM.getBoxModel", nodeId=nodeId)
+    quad = resp["result"]["model"]["content"]
+    Dict(:x => quad[1], :y => quad[2],
+         :width  => quad[3] - quad[1] + 1,
+         :height => quad[6] - quad[2] + 1,
+         :scale => 1.0)
 end
 
 @compat function Base.show(io::IO, m::MIME"image/svg+xml", v::VLSpec{:plot})
-   svgHeader = """
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-"""
+    svgHeader = """
+     <?xml version="1.0" encoding="utf-8"?>
+     <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+    """
+    write(io, svgHeader)
 
-    print(io, svgHeader)
-    print(io, convert_to_svg(v))
+    tmppath = writehtml_full(JSON.json(v.params))
+    withTarget(tmppath) do tg
+        nid = getPlotNodeId(tg)
+        resp = send(tg2, "DOM.getOuterHTML", nodeId=nid)
+        write(io, resp["result"]["outerHTML"])
+    end
 end
 
 @compat function Base.show(io::IO, m::MIME"application/pdf", v::VLSpec{:plot})
-    svgstring = convert_to_svg(v)
+    tmppath = writehtml_full(JSON.json(v.params))
 
-    r = Rsvg.handle_new_from_data(svgstring)
-    d = Rsvg.handle_get_dimensions(r)
-
-    cs = Cairo.CairoPDFSurface(io, d.width,d.height)
-    c = Cairo.CairoContext(cs)
-    Rsvg.handle_render_cairo(c,r)
-    finish(cs)
+    withTarget(tmppath) do tg
+        send(tg, "Page.printToPDF") do resp
+            write(io, base64decode(resp["result"]["data"]))
+        end
+    end
 end
-
-@compat function Base.show(io::IO, m::MIME"application/eps", v::VLSpec{:plot})
-    svgstring = convert_to_svg(v)
-
-    r = Rsvg.handle_new_from_data(svgstring)
-    d = Rsvg.handle_get_dimensions(r)
-
-    cs = Cairo.CairoEPSSurface(io, d.width,d.height)
-    c = Cairo.CairoContext(cs)
-    Rsvg.handle_render_cairo(c,r)
-    finish(cs)
-end
-
-# function Base.show(io::IO, m::MIME"application/postscript", v::VLSpec{:plot})
-#     svgstring = convert_to_svg(v)
-
-#     r = Rsvg.handle_new_from_data(svgstring)
-#     d = Rsvg.handle_get_dimensions(r)
-
-#     cs = Cairo.CairoPSSurface(io, d.width,d.height)
-#     c = Cairo.CairoContext(cs)
-#     Rsvg.handle_render_cairo(c,r)
-#     finish(cs)
-# end
 
 @compat function Base.show(io::IO, m::MIME"image/png", v::VLSpec{:plot})
-    svgstring = convert_to_svg(v)
+    tmppath = writehtml_full(JSON.json(v.params))
 
-    r = Rsvg.handle_new_from_data(svgstring)
-    d = Rsvg.handle_get_dimensions(r)
+    withTarget(tmppath) do tg
+        # find coordinates of VegaLite plot
+        vp = getBoxModel(tg)
 
-    cs = Cairo.CairoImageSurface(d.width,d.height,Cairo.FORMAT_ARGB32)
-    c = Cairo.CairoContext(cs)
-    Rsvg.handle_render_cairo(c,r)
-    Cairo.write_to_png(cs,io)
+        send(tg, "Page.captureScreenshot", format="png", clip=vp) do resp
+            write(io, base64decode(resp["result"]["data"]))
+        end
+    end
+end
+
+@compat function Base.show(io::IO, m::MIME"image/jpeg", v::VLSpec{:plot})
+    tmppath = writehtml_full(JSON.json(v.params))
+
+    withTarget(tmppath) do tg
+        # find coordinates of VegaLite plot
+        vp = getPlotNodeId(tg) |> getBoxModel()
+
+        send(tg, "Page.captureScreenshot", format="jpg", clip=vp) do resp
+            write(io, base64decode(resp["result"]["data"]))
+        end
+    end
 end
