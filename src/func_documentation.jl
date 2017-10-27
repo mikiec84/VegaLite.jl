@@ -22,7 +22,7 @@ function prettytype(typ::SpecDef)
   isa(typ, BoolDef) && return "Bool"
   isa(typ, VoidDef) && return "Void"
   isa(typ, AnyDef) && return "Any"
-  warn("[prettytype] unmamanged type $(typeof(typ))")
+  # warn("[prettytype] unmamanged type $(typeof(typ))")
   "???"
 end
 

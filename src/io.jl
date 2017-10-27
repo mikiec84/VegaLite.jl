@@ -52,7 +52,6 @@ function savefig(filename::AbstractString, v::VLSpec{:plot})
     savefig(filename, mime, v)
 end
 
-
 """
     svg(filename::AbstractString, v::VLSpec{:plot})
 Save the plot ``v`` as a svg file with name ``filename``.

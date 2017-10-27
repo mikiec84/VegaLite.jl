@@ -80,7 +80,7 @@ for (def, ns) in deftree
     if name=="*" # if UnionDef look up one level
       nsp = deftree[parentdef]
       nns = unique(collect(v[1] for v in nsp))
-      (length(nsp) > 1) && warn("which name ? $(join(nns, "," ))")
+      # (length(nsp) > 1) && warn("which name ? $(join(nns, "," ))")
       sfn        = Symbol(nsp[1][1])
       realparent = nsp[1][2]
     else

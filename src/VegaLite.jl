@@ -84,7 +84,6 @@ include("io.jl")
 include("show.jl")
 
 
-
 ########################  conditional definitions  #######################
 
 nonulldict(row) = map(t -> (t[1], isa(t[2], Nullable) ? get(t[2], "null") : t[2]), row)
@@ -110,6 +109,7 @@ end
   |>(a::DataTables.DataTable, b::VLSpec) = vldata(a) |> b
 end
 
-
+### Integration with Juno
+include("juno_integration.jl")
 
 end
