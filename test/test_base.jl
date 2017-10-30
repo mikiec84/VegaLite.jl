@@ -72,5 +72,5 @@ using RDatasets
 mpg = dataset("ggplot2", "mpg")
 
 @test isa(VegaLite.data(mpg), VegaLite.VLSpec{:data})
-@test equiv(VegaLite.data(mpg) |> config(vlcell(width=200)),
-            mpg |> config(vlcell(width=200)))
+@test equiv(VegaLite.data(mpg) |> plot(width=200),
+            mpg |> plot(width=200))

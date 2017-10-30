@@ -5,12 +5,14 @@ module VegaLite
 using JSON, Compat, Requires
 using HeadlessChromium
 using FileIO
+import FileIO: save
 
 # import Base: show
 import Base: display, REPL.REPLDisplay
 import Base: |>
 
-export renderer, actionlinks, junoplotpane, png, svg, jgp, pdf, savefig
+export renderer, actionlinks, junoplotpane
+export png, svg, jpg, pdf, save
 
 
 ########################  settings functions  ###############################

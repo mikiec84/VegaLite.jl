@@ -2,84 +2,61 @@
 #  Save to file functions
 ################################################################################
 
-function save(f::File{format"PNG"}, v::VLSpec{:plot})
-    open(f, "w") do s
-        show(s, MIME"image/png", v)
-    end
-end
 
-function savefig(filename::AbstractString, mime::AbstractString, v::VLSpec{:plot})
-    open(filename, "w") do f
-        show(f, mime, v)
-    end
-end
-
-
-# PhantomJS alternative
-# function tofile(path::String, plt::VLSpec{:plot}, format::String)
-#   checkplot(v)
-#
-#   pio = IOBuffer()
-#   writehtml_full(pio, JSON.json(v.params))
-#
-#   out = PhantomJS.renderhtml(seekstart(pio),
-#                              clipToSelector=".marks",
-#                              format=format)
-# end
-
+################   FileIO integration   ##############################
 
 """
-    savefig(filename::AbstractString, v::VLSpec{:plot})
-Save the plot ``v`` as a file with name ``filename``. The file format
-will be picked based on the extension of the filename.
-"""
-function savefig(filename::AbstractString, v::VLSpec{:plot})
-    file_ext = lowercase(splitext(filename)[2])
-    if file_ext == ".svg"
-        mime = "image/svg+xml"
-    elseif file_ext == ".pdf"
-        mime = "application/pdf"
-    elseif file_ext == ".png"
-        mime = "image/png"
-    elseif file_ext == ".eps"
-        mime = "application/eps"
-    # elseif file_ext == ".ps"
-    #     mime = "application/postscript"
-    else
-        throw(ArgumentError("Unknown file type."))
-    end
+    save(filename::AbstractString, v::VLSpec{:plot})
 
-    savefig(filename, mime, v)
-end
+Save the plot ``v`` using the FileIO package, guessing the format type with
+the file ``filename`` if it exists, or if not with file extension of ``filename``.
+"""
+save(f::File{format"PDF"}, v::VLSpec{:plot}) =
+  open(s -> show(s.io, MIME"application/pdf"(), v), f, "w")
 
-"""
-    svg(filename::AbstractString, v::VLSpec{:plot})
-Save the plot ``v`` as a svg file with name ``filename``.
-"""
-function svg(filename::AbstractString, v::VLSpec{:plot})
-    savefig(filename, "image/svg+xml", v)
-end
+save(f::File{format"PNG"}, v::VLSpec{:plot}) =
+  open(s -> show(s.io, MIME"image/png"()      , v), f, "w")
+
+save(f::File{format"JPEG"}, v::VLSpec{:plot}) =
+  open(s -> show(s.io, MIME"image/jpeg"()     , v), f, "w")
+
+save(f::File{format"SVG"}, v::VLSpec{:plot}) =
+  open(s -> show(s.io, MIME"image/svg+xml"()  , v), f, "w")
+
+
+################   saving functions by format   ########################
 
 """
     pdf(filename::AbstractString, v::VLSpec{:plot})
+
 Save the plot ``v`` as a pdf file with name ``filename``.
 """
-function pdf(filename::AbstractString, v::VLSpec{:plot})
-    savefig(filename, "application/pdf", v)
-end
+pdf(f::AbstractString, v::VLSpec{:plot}) =
+  open(s -> show(s, MIME"application/pdf"(), v), f, "w")
+
 
 """
     png(filename::AbstractString, v::VLSpec{:plot})
+
 Save the plot ``v`` as a png file with name ``filename``.
 """
-function png(filename::AbstractString, v::VLSpec{:plot})
-    savefig(filename, "image/png", v)
-end
+png(f::AbstractString, v::VLSpec{:plot}) =
+  open(s -> show(s, MIME"image/png"()      , v), f, "w")
+
 
 """
-    eps(filename::AbstractString, v::VLSpec{:plot})
-Save the plot ``v`` as a eps file with name ``filename``.
+    jpg(filename::AbstractString, v::VLSpec{:plot})
+
+Save the plot ``v`` as a jpeg file with name ``filename``.
 """
-function eps(filename::AbstractString, v::VLSpec{:plot})
-    savefig(filename, "application/eps", v)
-end
+jpg(f::AbstractString, v::VLSpec{:plot}) =
+  open(s -> show(s, MIME"image/jpeg"()     , v), f, "w")
+
+
+"""
+  svg(filename::AbstractString, v::VLSpec{:plot})
+
+Save the plot ``v`` as a svg file with name ``filename``.
+"""
+svg(f::AbstractString, v::VLSpec{:plot}) =
+  open(s -> show(s, MIME"image/svg+xml"()  , v), f, "w")
