@@ -142,7 +142,7 @@ function toDef(spec::Dict)
     return AnyDef("")
 
   else
-    # warn("not a ref, 'AnyOf' and no type")
+    DEBUG && warn("not a ref, 'AnyOf' and no type")
     return AnyDef("")
   end
 end

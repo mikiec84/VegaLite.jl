@@ -22,7 +22,7 @@ function prettytype(typ::SpecDef)
   isa(typ, BoolDef) && return "Bool"
   isa(typ, VoidDef) && return "Void"
   isa(typ, AnyDef) && return "Any"
-  # warn("[prettytype] unmamanged type $(typeof(typ))")
+  DEBUG && warn("[prettytype] unmamaged type $(typeof(typ))")
   "???"
 end
 
@@ -114,7 +114,6 @@ for (sfn, dvs) in funcs
       pfns = get(def2funcs, pdef, [:unknown])
       for pfn in pfns
         for d in vdef
-          # println(pfn)
           pfuncs[pfn] = push!(get(pfuncs, pfn, Set()), d)
         end
       end

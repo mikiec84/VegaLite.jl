@@ -16,7 +16,7 @@ function Juno.render(i::Juno.Inline, plt::VLSpec{:plot})
 end
 
 # TODO : plotpane rendering
-# # if package PhantomJS is present redirect rendering to Juno's plot pane
+# 
 # try
 #   import PhantomJS
 #

@@ -7,9 +7,9 @@ using BinDeps
 
 # Vega-lite version v2.0.0-beta.4, commit dac71df
 ud3       = "https://d3js.org/d3.v3.min.js"  # FIXME find URL with stable D3 version
-uvega     = "https://cdnjs.cloudflare.com/ajax/libs/vega/3.0.2/vega.min.js"
-uvegalite = "https://cdnjs.cloudflare.com/ajax/libs/vega-lite/2.0.0-rc3/vega-lite.min.js"
-uembed    = "https://cdnjs.cloudflare.com/ajax/libs/vega-embed/3.0.0-beta.20/vega-embed.min.js"
+uvega     = "https://cdnjs.cloudflare.com/ajax/libs/vega/3.0.7/vega.min.js"
+uvegalite = "https://cdnjs.cloudflare.com/ajax/libs/vega-lite/2.0.1/vega-lite.min.js"
+uembed    = "https://cdnjs.cloudflare.com/ajax/libs/vega-embed/3.0.0-rc7/vega-embed.min.js"
 
 destdir      = joinpath(dirname(@__FILE__), "lib")
 

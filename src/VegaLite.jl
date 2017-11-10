@@ -14,6 +14,7 @@ import Base: |>
 export renderer, actionlinks, junoplotpane
 export png, svg, jpg, pdf, save
 
+const DEBUG = true
 
 ########################  settings functions  ###############################
 

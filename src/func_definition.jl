@@ -80,7 +80,7 @@ for (def, ns) in deftree
     if name=="*" # if UnionDef look up one level
       nsp = deftree[parentdef]
       nns = unique(collect(v[1] for v in nsp))
-      # (length(nsp) > 1) && warn("which name ? $(join(nns, "," ))")
+      DEBUG && (length(nsp) > 1) && warn("which name ? $(join(nns, "," ))")
       sfn        = Symbol(nsp[1][1])
       realparent = nsp[1][2]
     else
@@ -95,16 +95,6 @@ for (def, ns) in deftree
   end
 end
 
-# length(funcs) # 51
-# showall(keys(funcs))
-# k,v = first(funcs)
-# k,v = :vllayer, funcs[:vllayer]
-# for (k,v) in funcs
-#   v2 = filter(needsfunction, keys(v))
-#   na  = sum( isa(d, ArrayDef) for d in v2 )
-#   nna = sum( !isa(d, ArrayDef) for d in v2 )
-#   (na > 0 ) && println("$k : $na $nna")
-# end
 
 const arrayprops = Symbol[:layer, :transform, :hconcat, :vconcat]
 
