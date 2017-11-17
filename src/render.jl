@@ -21,7 +21,7 @@ function writehtml_full(io::IO, spec::String; title="VegaLite plot")
     <head>
       <title>$title</title>
       <meta charset="UTF-8">
-      <script src="file://$(asset("d3.v3.min.js"))"></script>
+    //  <script src="file://$(asset("d3.v3.min.js"))"></script>
       <script src="file://$(asset("vega.min.js"))"></script>
       <script src="file://$(asset("vega-lite.min.js"))"></script>
       <script src="file://$(asset("vega-embed.min.js"))"></script>
@@ -49,7 +49,7 @@ function writehtml_full(io::IO, spec::String; title="VegaLite plot")
 
       var spec = $spec
 
-      vega.embed('#$divid', spec, opt);
+      vegaEmbed('#$divid', spec, opt);
 
     </script>
 
