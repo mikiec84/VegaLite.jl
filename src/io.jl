@@ -2,18 +2,11 @@
 #  Save to file functions
 ################################################################################
 
-function save(f::File{format"PNG"}, v::VLSpec{:plot})
-    open(f, "w") do s
-        show(s, MIME"image/png", v)
-    end
-end
-
 function savefig(filename::AbstractString, mime::AbstractString, v::VLSpec{:plot})
     open(filename, "w") do f
         show(f, mime, v)
     end
 end
-
 
 # PhantomJS alternative
 # function tofile(path::String, plt::VLSpec{:plot}, format::String)

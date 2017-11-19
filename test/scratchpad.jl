@@ -1,11 +1,4 @@
 
-module A
-end
-
-reload("VegaLite")
-
-module A
-
 using VegaLite
 
 ############################################################
@@ -21,7 +14,52 @@ p = plot(vldata(url=durl),
 
 p
 
-pdf("c:/temp/ex.pdf", p)
+tmppath = VegaLite.writehtml_full(JSON.json(p.params))
+tg = HeadlessChromium.Target("file://$tmppath")
+
+
+send(tg, "Page.enable")
+send(tg, "DOM.enable")
+
+send(tg, "DOM.getDocument")
+
+# search with xpath '.marks'
+resp = send(tg, "DOM.performSearch", query=".marks")
+resp["result"]["resultCount"] == 0 && error("plot not found")
+resp["result"]["resultCount"] > 1 && error("plot not located")
+sid = resp["result"]["searchId"]
+
+resp = send(tg, "DOM.getSearchResults", searchId=sid, fromIndex=0, toIndex=1)
+length(resp["result"]["nodeIds"]) != 1 && error("inconsistent number of plot node Ids")
+pid = resp["result"]["nodeIds"][1]
+(pid == 0) && error("node not found")
+
+pid
+
+
+vp = VegaLite.getBoxModel(tg, 10)
+
+resp = send(tg, "Page.captureScreenshot", format="png", clip=vp)
+
+write(io, base64decode(resp["result"]["data"]))
+end
+
+pdf("/tmp/ex.pdf", p)
+png("/tmp/ex.png", p)
+svg("/tmp/ex.svg", p)
+
+using FileIO
+
+save("pdf", p)
+
+
+
+
+
+
+
+
+
 
 
 
