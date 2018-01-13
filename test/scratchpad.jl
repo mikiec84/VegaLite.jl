@@ -12,6 +12,14 @@ p = plot(vldata(url=durl),
                 vlsize(aggregate=:count, typ=:quantitative)),
      width=300, height=300) ;
 
+     data(url=durl) |>
+     markcircle() |>
+     encoding(vlx(vlbin(maxbins=10), field=:IMDB_Rating, typ=:quantitative),
+              vly(vlbin(maxbins=10), field=:Rotten_Tomatoes_Rating, typ=:quantitative),
+              vlsize(aggregate=:count, typ=:quantitative)) |>         # bind color to :Manufacturer, nominal scale
+     plot(width=150, height=150)
+
+
 p
 
 tmppath = VegaLite.writehtml_full(JSON.json(p.params))
@@ -61,6 +69,62 @@ save("pdf", p)
 
 
 
+save("c:/temp/abcd1.png", p)
+save("c:/temp/abcd2.jpeg", p)
+
+save("c:/temp/abcd4.pdf", p)
+save("c:/temp/abcd5.svg", p)
+
+close(VegaLite.HeadlessChromium.chromiumHandle)
+
+
+import JSON
+cb(resp) = info("received : $resp)")
+
+tmppath = VegaLite.writehtml_full(JSON.json(p.params))
+tg = VegaLite.Target("file://$tmppath")
+
+# VegaLite.getPlotNodeId(tg)
+
+# search with xpath '.marks'
+send(tg, "DOM.getDocument")
+
+resp = send(tg, "DOM.performSearch", query="svg.marks")
+resp["result"]["resultCount"] == 0 && error("plot not found")
+resp["result"]["resultCount"] > 1 && error("plot not located")
+sid = resp["result"]["searchId"]
+
+resp = send(tg, "DOM.getSearchResults", searchId=sid, fromIndex=0, toIndex=1)
+length(resp["result"]["nodeIds"]) != 1 && error("inconsistent number of plot node Ids")
+pid = resp["result"]["nodeIds"][1]
+(pid == 0) && error("node not found")
+pid
+
+
+pid = VegaLite.getPlotNodeId(tg)
+vp = VegaLite.getBoxModel(tg, pid)
+
+resp = send(tg, "Page.captureScreenshot", format="png", clip=vp)
+length(base64decode(resp["result"]["data"]))
+
+open("c:/temp/abcd.png", "w") do io
+   write(io, base64decode(resp["result"]["data"]))
+end
+
+
+
+
+
+
+methods(show, (IO, MIME"image/png", Any))
+
+
+IOStream <: IO
+
+VegaLite.format"PNG"
+
+
+methods(show, (IO, Any, VegaLite.VLSpec{:plot}))
 
 
 plot(vldata(url=durl),

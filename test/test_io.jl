@@ -1,5 +1,4 @@
 using Base.Test
-using Compat
 using VegaLite
 using DataFrames
 
@@ -7,34 +6,46 @@ p = VegaLite.data(DataFrame(x = [1,2,3], y=[1,2,3])) |>
     markpoint() |>
     encoding(xquantitative(field=:x), yquantitative(field=:y))
 
+Base.Filesystem.mktempdir() do folder
+    fn = joinpath(folder,"test1.svg")
+    svg(fn, p)
+    @test isfile(fn)
+    @test stat(fn).size > 5000
 
-VegaLite.save("c:/temp/tplot.png", p)
+    fn = joinpath(folder,"test1.pdf")
+    pdf(fn, p)
+    @test isfile(fn)
+    @test stat(fn).size > 5000
 
-folder = "c:/temp"
+    fn = joinpath(folder,"test1.png")
+    png(fn, p)
+    @test isfile(fn)
+    @test stat(fn).size > 5000
 
-Compat.Filesystem.mktempdir() do folder
-    svg(joinpath(folder,"test1.svg"), p)
-    @test isfile(joinpath(folder,"test1.svg"))
+    fn = joinpath(folder,"test1.jpg")
+    jpg(fn, p)
+    @test isfile(fn)
+    @test stat(fn).size > 5000
 
-    pdf(joinpath(folder,"test1.pdf"), p)
-    @test isfile(joinpath(folder,"test1.pdf"))
 
-    png(joinpath(folder,"test1.png"), p)
-    @test isfile(joinpath(folder,"test1.png"))
+    fn = joinpath(folder,"test2.svg")
+    save(fn, p)
+    @test isfile(fn)
+    @test stat(fn).size > 5000
 
-    VegaLite.eps(joinpath(folder,"test1.eps"), p)
-    @test isfile(joinpath(folder,"test1.eps"))
+    fn = joinpath(folder,"test2.pdf")
+    save(fn, p)
+    @test isfile(fn)
+    @test stat(fn).size > 5000
 
-    savefig(joinpath(folder,"test2.svg"), p)
-    @test isfile(joinpath(folder,"test2.svg"))
+    fn = joinpath(folder,"test2.png")
+    save(fn, p)
+    @test isfile(fn)
+    @test stat(fn).size > 5000
 
-    savefig(joinpath(folder,"test2.pdf"), p)
-    @test isfile(joinpath(folder,"test2.pdf"))
-
-    savefig(joinpath(folder,"test2.png"), p)
-    @test isfile(joinpath(folder,"test2.png"))
-
-    savefig(joinpath(folder,"test2.eps"), p)
-    @test isfile(joinpath(folder,"test2.eps"))
+    fn = joinpath(folder,"test2.jpg")
+    save(fn, p)
+    @test isfile(fn)
+    @test stat(fn).size > 5000
 
 end

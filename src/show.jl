@@ -1,18 +1,15 @@
 
 function withTarget(action::Function, htmlpath::String)
-    tg = Target("file://$htmlpath")
+    tg = Target("file:///$htmlpath")
     action(tg)
     close(tg)
 end
 
 function getPlotNodeId(tg::Target)
-    send(tg, "Page.enable")
-    send(tg, "DOM.enable")
-
     send(tg, "DOM.getDocument")
 
-    # search with xpath '.marks'
-    resp = send(tg, "DOM.performSearch", query=".marks")
+    # search with xpath 'svg.marks'
+    resp = send(tg, "DOM.performSearch", query="svg.marks")
     resp["result"]["resultCount"] == 0 && error("plot not found")
     resp["result"]["resultCount"] > 1 && error("plot not located")
     sid = resp["result"]["searchId"]
@@ -25,7 +22,7 @@ function getPlotNodeId(tg::Target)
     pid
 end
 
-function getBoxModel(tg::Target, nodeId::Int)
+function getBoxModel(tg::Target, nodeId::Int64)
     resp = send(tg, "DOM.getBoxModel", nodeId=nodeId)
     quad = resp["result"]["model"]["content"]
     Dict(:x => quad[1], :y => quad[2],
@@ -37,12 +34,14 @@ end
 @compat function Base.show(io::IO, m::MIME"image/svg+xml", v::VLSpec{:plot})
     write(io, """<?xml version="1.0" encoding="utf-8"?>""")
     write(io, """<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">""")
+    svgstyle = "xmlns=\"http://www.w3.org/2000/svg\""
 
     tmppath = writehtml_full(JSON.json(v.params))
     withTarget(tmppath) do tg
         nid = getPlotNodeId(tg)
         resp = send(tg, "DOM.getOuterHTML", nodeId=nid)
-        write(io, resp["result"]["outerHTML"])
+        rawstr = resp["result"]["outerHTML"]
+        write(io, rawstr[1:5] * svgstyle * rawstr[5:end] )
     end
     nothing
 end
@@ -51,9 +50,9 @@ end
     tmppath = writehtml_full(JSON.json(v.params))
 
     withTarget(tmppath) do tg
-        send(tg, "Page.printToPDF") do resp
-            write(io, base64decode(resp["result"]["data"]))
-        end
+        send(tg, "DOM.getDocument") # forces evaluation ?
+        resp = send(tg, "Page.printToPDF")
+        write(io, base64decode(resp["result"]["data"]))
     end
     nothing
 end
@@ -62,13 +61,10 @@ end
     tmppath = writehtml_full(JSON.json(v.params))
 
     withTarget(tmppath) do tg
-        # find coordinates of VegaLite plot
-        vp = getBoxModel(tg, getPlotNodeId(tg))
-        println(vp)
+        vp = getBoxModel(tg, getPlotNodeId(tg)) # find coordinates of VegaLite plot
 
-        send(tg, "Page.captureScreenshot", format="png", clip=vp) do resp
-            write(io, base64decode(resp["result"]["data"]))
-        end
+        resp = send(tg, "Page.captureScreenshot", format="png", clip=vp)
+        write(io, base64decode(resp["result"]["data"]))
     end
     nothing
 end
@@ -77,12 +73,10 @@ end
     tmppath = writehtml_full(JSON.json(v.params))
 
     withTarget(tmppath) do tg
-        # find coordinates of VegaLite plot
-        vp = getBoxModel(tg, getPlotNodeId(tg))
+        vp = getBoxModel(tg, getPlotNodeId(tg)) # find coordinates of VegaLite plot
 
-        send(tg, "Page.captureScreenshot", format="jpg", clip=vp) do resp
-            write(io, base64decode(resp["result"]["data"]))
-        end
+        resp = send(tg, "Page.captureScreenshot", format="jpeg", clip=vp)
+        write(io, base64decode(resp["result"]["data"]))
     end
     nothing
 end
