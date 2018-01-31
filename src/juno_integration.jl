@@ -16,10 +16,10 @@ pushdisplay(BrowserDisplay())
 pushdisplay(BlinkDisplay())
 
 
-function display(::IDEDisplay, plt::VLSpec{:plot})
-  # decline if not possible
-
-end
+# function display(::IDEDisplay, plt::VLSpec{:plot})
+#   # decline if not possible
+# 
+# end
 
 function Base.Multimedia.display(::BrowserDisplay, plt::VLSpec{:plot})
   checkplot(plt)
@@ -37,7 +37,7 @@ if Pkg.installed("Blink") != nothing
     global win, idcounter
     checkplot(plt)
 
-    if (win==nothing || active(win))
+    if (win == nothing) || !active(win)
       win = Window()
       opentools(w)
 
@@ -60,7 +60,7 @@ if Pkg.installed("Blink") != nothing
     end
     # body!(win, "<div id='$idstr'></div>")
     @js_ win spec = $(plt.params)
-    @js_ w vegaEmbed("#$idstr", spec2, opt)
+    @js_ w vegaEmbed($("#$idstr"), spec2, opt)
   end
 end
 
