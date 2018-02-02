@@ -277,3 +277,76 @@ data(url=durl) |>
 
 
 ############################################################
+
+
+using NamedTuples
+using VegaLite, NamedTuples
+
+reload("VegaLite")
+Base.Multimedia.displays
+
+methods(display,(Display, Any))
+
+
+VegaLite.BrowserDisplay
+
+actionlinks(false)
+[  @NT(x=1., pdf=3.), @NT(x=2., pdf=2.)] |>
+     markline(orient=:vertical) |>
+     encoding(xquantitative(field=:x),
+              yquantitative(field=:pdf))
+
+applicable(display, BlinkDisplay, )
+
+
+using Blink
+
+ww = Window(Dict(:title=>"abcd", "devTools"=>true))
+opentools(ww)
+
+################################################################################
+
+using Blink
+
+w = Window()
+opentools(w)
+
+spec2_dict = Dict("data"=>Dict("values"=> [Dict("task"=>"X","start"=>1, "end"=>3),
+                                  Dict("task"=>"B","start"=>3, "end"=>8),
+                                  Dict("task"=>"C","start"=>2, "end"=>10)]),
+                 "mark"=>"bar",
+                 "encoding"=>Dict("y"=>Dict("field"=>"task", "type"=>"ordinal"),
+                                  "x"=>Dict("field"=>"start", "type"=>"quantitative"),
+                                  "x2"=>Dict("field"=>"end", "type"=>"quantitative")))
+
+
+
+active(w)
+
+
+# body!(w, "apoapzfqsf <button id='gobutton'>Click me!</button>")
+#
+# handle(w, "press") do args...
+#   @show args
+# end
+#
+# handle((args...) -> println("hello"), w, "press")
+# @js_ w document.querySelector("gobutton").onclick = () -> Blink.msg("press", "foo")
+#
+# handle((args...) -> println("hello"), w, "press2")
+# @js_ w document.querySelector("gobutton").onclick = () -> Blink.msg("press2", "foo")
+
+# Blink.AtomShell.@dot w getTitle()
+# Blink.AtomShell.@dot w webContents()
+
+
+w2 = Blink.Window()
+Blink.body!(w2, "My Fancy App!<br/><br/><button id='gobutton'>Click me!</button>");
+
+
+title(w2, "bleurp");nothing
+
+handle(w, "press") do args...
+  @show args
+end
+@js_ w document.querySelector("gobutton").onclick = () -> Blink.msg("press", "foo")

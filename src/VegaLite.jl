@@ -81,7 +81,7 @@ include("func_documentation.jl")
 include("spec_validation.jl")
 include("utils.jl")
 include("render.jl")
-include("juno_integration.jl")
+include("display.jl")
 include("io.jl")
 include("show.jl")
 include("macro.jl")
@@ -100,10 +100,5 @@ function vldata(d)
 end
 
 |>(a, b::VLSpec) = vldata(a) |> b
-
-########################  conditional definitions  #######################
-
-### Integration with Juno
-include("juno_integration.jl")
 
 end
