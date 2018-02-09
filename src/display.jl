@@ -1,6 +1,6 @@
 ######################################################################
 #
-#     Display Juno Integration
+#    Initializations and settings for plot display
 #
 ######################################################################
 
@@ -8,17 +8,12 @@ struct IDEDisplay <: Display ; end
 struct BrowserDisplay <: Display ; end
 struct BlinkDisplay <: Display ; end
 
-# Local, ad-hoc, implementation of the displays framework of Base.Multimedia
-# because it is hijacked by Juno's Media and cannot be used as intended
-VLDisplays = Display[]
 
-# pushdisplay(IDEDisplay())
-# popdisplay(IDEDisplay())
-
-pushdisplay(BrowserDisplay())
-pushdisplay(BlinkDisplay())
-
-println(Base.Multimedia.displays)
+function __init__()
+  pushdisplay(BrowserDisplay())
+  pushdisplay(BlinkDisplay())
+  # println(Base.Multimedia.displays)
+end
 
 # function display(::IDEDisplay, plt::VLSpec{:plot})
 #   # decline if not possible
@@ -31,7 +26,7 @@ function Base.Multimedia.display(::BrowserDisplay, plt::VLSpec{:plot})
   launch_browser(tmppath) # Open the browser
 end
 
-@require Blink begin  # only if/when Blink is loaded
+# @require Blink begin  # only if/when Blink is loaded
   import Blink
 
   global win = nothing
@@ -90,7 +85,7 @@ end
     nothing
   end
 
-end
+# end
 
 
 @require Juno begin  # only if/when Juno is loaded
@@ -99,8 +94,6 @@ end
 
   # media(VLSpec)
   # media(VLSpec, Media.Plot)
-  # media(VLSpec, Media.Textual)
-
   function Juno.render(i::Juno.Inline, plt::VLSpec{:plot})
     display(plt)
     Juno.render(i, nothing) # print nothing in the editor pane

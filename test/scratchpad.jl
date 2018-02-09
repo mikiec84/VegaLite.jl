@@ -280,21 +280,28 @@ data(url=durl) |>
 
 
 using NamedTuples
-using VegaLite, NamedTuples
+using VegaLite
 
 reload("VegaLite")
 Base.Multimedia.displays
+using VegaLite
+using Blink
 
 methods(display,(Display, Any))
-
+5+6
 
 VegaLite.BrowserDisplay
 
 actionlinks(false)
-[  @NT(x=1., pdf=3.), @NT(x=2., pdf=2.)] |>
+plt = [  @NT(x=1., pdf=3.), @NT(x=2., pdf=2.)] |>
      markline(orient=:vertical) |>
      encoding(xquantitative(field=:x),
               yquantitative(field=:pdf))
+
+display(VegaLite.BrowserDisplay(), plt)
+display(VegaLite.BlinkDisplay(), plt)
+
+using Blink
 
 applicable(display, BlinkDisplay, )
 
@@ -350,3 +357,41 @@ handle(w, "press") do args...
   @show args
 end
 @js_ w document.querySelector("gobutton").onclick = () -> Blink.msg("press", "foo")
+
+##################################################
+
+using VegaLite
+using NamedTuples
+
+dat = [  @NT(x=x, y=sin(x)) for x in linspace(-π,π,50) ]
+plt = dat |> markline(orient=:vertical) |> encoding(xquantitative(field=:x),
+              yquantitative(field=:y))
+
+typeof.(Base.Multimedia.displays)
+methods(display, (Display, VegaLite.VLSpec))
+
+actionlinks(false)
+using Blink
+
+
+
+
+VegaLite.display(VegaLite.BlinkDisplay(), plt)
+
+VegaLite.Blink.js(VegaLite.win, :( document.querySelector("gobutton").onclick = () -> Blink.msg("press", "foo")
+
+VegaLite.Blink.js(VegaLite.win, :( document ) )
+
+VegaLite.Blink.js(VegaLite.win, :( document.getTitle() ) )
+
+Blink.AtomShell.@dot VegaLite.win getTitle()
+Blink.AtomShell.@dot VegaLite.win getImage(100,100)
+
+Blink.AtomShell.@dot VegaLite.win printToPDF()
+5+6
+
+Blink.js(VegaLite.win, :( document.getImage(100,110)) )
+
+Blink.js(VegaLite.win, :( win.isVisible() ) )
+
+Blink.AtomShell.dot(VegaLite.win, :( isVisible() ))
